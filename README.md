@@ -1,26 +1,8 @@
-# moveit2_examples
-Sample code to call the moveit2 api
+# ROS Realtime API
+Sample code to call the ros2 apis
 
 ## Setup
-The robot must be set up in a certain way before the it will work with moveit2 api
-
-1. Disable the firewall: `sudo ufw disable`
-2. Set the cyclone dds interface port to `wireless0` or `external0`
-
-```
-<?xml version="1.0" encoding="UTF-8" ?>
-<CycloneDDS xmlns="https://cdds.io/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"    xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
-    <Domain id="any">
-        <General>
-            <Interfaces>
-                 <NetworkInterface name="internal0" priority="0"/>
-            </Interfaces>
-        </General>
-    </Domain>
-</CycloneDDS>
-```
-3. Turn `Enable ROS2 Control` and `Enable ROS2 motions`
-3. Restart the services
+There is one time setup that needs to be done by a standard bots engineer.
 
 ## Building
 
