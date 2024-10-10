@@ -26,7 +26,7 @@ class ReadJointState(Node):
     def get_joint_positions(self):
         return self.joint_positions
 
-def main():
+if __name__ == "__main__":
     rclpy.init()
     
     read_joint_state_node = ReadJointState()
@@ -38,6 +38,3 @@ def main():
     finally:
         print("Cleaning up...")
         rclpy.shutdown()
-
-if __name__ == "__main__":
-    main()
