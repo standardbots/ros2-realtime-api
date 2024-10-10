@@ -2,7 +2,11 @@
 Sample code to call the ros2 apis
 
 ## Setup
-There is one time setup that needs to be done by a standard bots engineer.
+There is one time setup that needs to be done by a standard bots engineer. Please ask standardbots to do setup for you
+
+1. Update the `cyclonedds.xml` NetworkInterface name to the adapter you will be using
+2. Build
+3. Run
 
 ## Building
 

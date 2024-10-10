@@ -20,9 +20,8 @@ class ReadJointState(Node):
             10
         )
 
-
     def joint_state_callback(self, msg):
-        print(msg.position)
+        print([val for val in msg.position])
 
     def get_joint_positions(self):
         return self.joint_positions
