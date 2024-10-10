@@ -1,6 +1,7 @@
 import time
 import rclpy
 import json
+import sys
 
 from rclpy.node import Node
 from rclpy.time import Time
@@ -49,7 +50,7 @@ if __name__ == "__main__":
     rclpy.init()
     
     poses = []
-    with open("./data/pose1.log") as fin:
+    with open(sys.argv[1]) as fin:
         for line in fin:
             poses.append(json.loads(line))
 

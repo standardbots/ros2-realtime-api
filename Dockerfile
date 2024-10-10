@@ -31,5 +31,5 @@ RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 COPY ./src/* ./src/
 COPY ./data/* ./data/
 
-CMD [ "python3", "src/write_poses.py" ]
-# CMD [ "python3", "src/read_joint_states.py" ]
+# CMD [ "python3", "src/write_poses.py" ]
+CMD [ "python3", "src/read_joint_states.py" ]

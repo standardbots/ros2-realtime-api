@@ -16,8 +16,16 @@ There is one time setup that needs to be done by a standard bots engineer. Pleas
 
 ## Running
 
+### Run the default script
+
 ```
 ./run.sh
+```
+
+### Run a different script
+
+```
+./run.sh python3 ./src/write_poses.py ./data/pose3.log"
 ```
 
 ## Run in docker environement
