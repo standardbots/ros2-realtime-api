@@ -23,6 +23,10 @@ COPY ./cyclonedds.xml /etc/standardbots/configuration/cyclonedds.xml
 
 RUN source /opt/ros/humble/setup.bash && pip3 install rclpy
 
+# Copy requirements.txt and install Python dependencies
+COPY ./requirements.txt .
+RUN pip3 install -r requirements.txt
+
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV CYCLONEDDS_URI=/etc/standardbots/configuration/cyclonedds.xml
 
