@@ -204,7 +204,7 @@ def main():
         # Instantiate robot interface
         sdk = StandardBotsRobot(
             url='http://localhost:3000',
-            token='k9fw7-lbesawc-w54djg-8fp8rk',
+            token='<ENTER_KEY_HERE',
             robot_kind=StandardBotsRobot.RobotKind.Live,
         )
 
