@@ -13,15 +13,28 @@ RUN \
     ros-humble-moveit-msgs \
     ros-humble-control-msgs \
     ros-humble-sensor-msgs \
-    ros-humble-trajectory-msgs
-
+    ros-humble-trajectory-msgs \
+    python3-colcon-common-extensions
 
 WORKDIR /app
 
 RUN mkdir -p /etc/standardbots/configuration/
 COPY ./cyclonedds.xml /etc/standardbots/configuration/cyclonedds.xml
 
-RUN source /opt/ros/humble/setup.bash && pip3 install rclpy
+COPY ./ ./
+
+# Build standard_bots_msgs package
+RUN source /opt/ros/humble/setup.bash \
+    && colcon build --packages-select standard_bots_msgs
+
+# Add ROS environment setup to .bashrc for interactive shells
+RUN echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc && \
+    echo 'source /app/install/setup.bash' >> ~/.bashrc
+
+# Install Python dependencies
+RUN source /opt/ros/humble/setup.bash \
+    && source ./install/setup.bash \
+    && pip3 install rclpy
 
 # Copy requirements.txt and install Python dependencies
 COPY ./requirements.txt .
@@ -30,10 +43,5 @@ RUN pip3 install -r requirements.txt
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV CYCLONEDDS_URI=/etc/standardbots/configuration/cyclonedds.xml
 
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-
-COPY ./src/* ./src/
-COPY ./data/* ./data/
-
 # CMD [ "python3", "src/write_poses.py" ]
-CMD [ "python3", "src/read_joint_states.py" ]
+CMD [ "python3", "src/plan_motion_plan.py", "data/joint_positions.json" ]
