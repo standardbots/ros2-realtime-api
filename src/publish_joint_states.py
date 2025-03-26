@@ -33,6 +33,7 @@ class JointTrajectoryPublisher(Node):
         self.acceleration_data = acceleration_data
 
         self.topic = f"/{bot_id}/ro1/hardware/joint_trajectory"
+        print("publishing to: ", self.topic)
         self.joint_publisher = self.create_publisher(
             JointTrajectory,
             self.topic,
@@ -97,7 +98,7 @@ class JointTrajectoryPublisher(Node):
             point = JointTrajectoryPoint()
             point.positions = self.position_data[self.index]
 
-            print(self.position_data[self.index])
+            # print(self.position_data[self.index])
 
             point.velocities = self.velocity_data[self.index] if len(self.velocity_data) > 0 else []
             point.accelerations = self.acceleration_data[self.index] if len(self.acceleration_data) > 0 else []
@@ -112,9 +113,9 @@ class JointTrajectoryPublisher(Node):
             msg.joint_names = ["joint0", "joint1", "joint2", "joint3", "joint4", "joint5"]
             msg.points.append(point)
             self.joint_publisher.publish(msg)
-            self.get_logger().info(
-                f"Published point {self.index} with time: {point.time_from_start.sec}.{point.time_from_start.nanosec}"
-            )
+            # self.get_logger().info(
+            #     f"Published point {self.index} with time: {point.time_from_start.sec}.{point.time_from_start.nanosec}"
+            # )
             self.index += 1
 
 
@@ -203,13 +204,23 @@ def main():
         # Instantiate robot interface
         sdk = StandardBotsRobot(
             url='http://localhost:3000',
-            token='8330nv-cf504-g9t85cp8-0zxbmg',
+            token='<KEY>',
             robot_kind=StandardBotsRobot.RobotKind.Live,
         )
 
         print("Connecting to robot...")
 
         with sdk.connection():
+
+            target_position = (1.07, 0, 0, 0, 0, 0)
+            body = models.ArmPositionUpdateRequest(
+                kind=models.ArmPositionUpdateRequestKindEnum.JointRotation,
+                joint_rotation=models.ArmJointRotations(joints=target_position),
+            )
+
+            sdk.movement.position.set_arm_position(body=body)
+
+
             # Set teleoperation/ROS control state
             sdk.ros.control.update_ros_control_state(
                 models.ROSControlUpdateRequest(
@@ -233,7 +244,7 @@ def main():
         velocity_data: List[List[float]] = []
         acceleration_data: List[List[float]] = []
 
-        bot_id = "bot_0sapi_zq17Nir8hAy"  # ADD YOUR BOT ID HERE
+        bot_id = "bot_0sapi_JtIyPswZIrYJeAZy4oUi"  # ADD YOUR BOT ID HERE
         Ts = 0.005
 
         # Initialize ROS
@@ -286,7 +297,7 @@ def main():
         with sdk.connection():
             time.sleep(1.0)  # 1 second pause
 
-            target_position = (1.07, 1.07, -1.07, 0, 0, 0)
+            target_position = (1.07, 0, 0, 0, 0, 0)
             body = models.ArmPositionUpdateRequest(
                 kind=models.ArmPositionUpdateRequestKindEnum.JointRotation,
                 joint_rotation=models.ArmJointRotations(joints=target_position),
