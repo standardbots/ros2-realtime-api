@@ -23,17 +23,11 @@ COPY ./cyclonedds.xml /etc/standardbots/configuration/cyclonedds.xml
 
 COPY ./ ./
 
-# Build standard_bots_msgs package
-RUN source /opt/ros/humble/setup.bash \
-    && colcon build --packages-select standard_bots_msgs
-
 # Add ROS environment setup to .bashrc for interactive shells
-RUN echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc && \
-    echo 'source /app/install/setup.bash' >> ~/.bashrc
+RUN echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc
 
 # Install Python dependencies
 RUN source /opt/ros/humble/setup.bash \
-    && source ./install/setup.bash \
     && pip3 install rclpy
 
 # Copy requirements.txt and install Python dependencies
