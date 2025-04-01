@@ -25,12 +25,11 @@ There is one time setup that needs to be done by a standard bots engineer. Pleas
 ### Run a different script
 
 ```
-./run.sh python3 ./src/write_poses.py ./data/pose3.log"
+./run.sh python3 ./src/write_poses.py --bot-id=<ROBOT_ID> ./data/pose1.log"
 ```
 
 ## Run in docker environement
 
 1. `./run_shell.sh`
-1. `cd /src`
 1. `python3 ./src/plan_and_execute.py`
 
