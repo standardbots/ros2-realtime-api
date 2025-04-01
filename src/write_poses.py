@@ -2,6 +2,7 @@ import time
 import rclpy
 import json
 import sys
+import argparse
 
 from rclpy.node import Node
 from rclpy.time import Time
@@ -15,10 +16,12 @@ class WritePose(Node):
 
         if robot_id is None:
             self.robot_id = get_bot_id(self)
+        else:
+            self.robot_id = robot_id
 
         self.publisher = self.create_publisher(
             PoseStamped,
-            f"/{self.robot_id}/ro1/hardware/pose/write", 
+            f"/{self.robot_id}/ro1/hardware/pose/write",
             10
         )
 
@@ -43,18 +46,23 @@ class WritePose(Node):
 
             self.publisher.publish(pose_stamped)
 
-            time.sleep(0.02)       
+            time.sleep(0.02)
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Write poses to a robot')
+    parser.add_argument('file', type=str, help='Path to the pose file')
+    parser.add_argument('--bot-id', type=str, help='Robot ID to write poses to')
+    args = parser.parse_args()
+
     rclpy.init()
-    
+
     poses = []
-    with open(sys.argv[1]) as fin:
+    with open(args.file) as fin:
         for line in fin:
             poses.append(json.loads(line))
 
-    write_joint_state_node = WritePose(poses=poses)
+    write_joint_state_node = WritePose(poses=poses, robot_id=args.bot_id)
 
     try:
         rclpy.spin(write_joint_state_node)

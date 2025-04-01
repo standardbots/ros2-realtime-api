@@ -12,7 +12,7 @@ if [ $# -eq 0 ]; then
     echo "Running Docker container with default settings..."
     $DOCKER_CMD
 else
-    # If argument is provided, use it as the command for the Docker container
-    echo "Running Docker container with provided command: $@"
-    $DOCKER_CMD bash -c "$@"
+    # Pass all arguments directly to the container
+    echo "Running Docker container with arguments: $@"
+    $DOCKER_CMD "$@"
 fi
