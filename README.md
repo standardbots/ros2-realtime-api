@@ -31,5 +31,5 @@ There is one time setup that needs to be done by a standard bots engineer. Pleas
 ## Run in docker environement
 
 1. `./run_shell.sh`
-1. `python3 ./src/plan_and_execute.py`
+1. `python3 ./src/read_joint_states.py --bot-id=<ROBOT_ID>`
 
