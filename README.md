@@ -5,10 +5,11 @@ Sample code to call the ros2 apis
 
 1. Enable the ROS2 API and ROS2 Bridge features from the Standard Bots app (Settings -> Configure Developer API)
    - ROS2 API enables control of the robot via ROS
-   - ROS2 bridge publishes ROS topics to the local network
-3. Update the `cyclonedds.xml` NetworkInterface name to the adapter you will be using
-4. Build
-5. Run
+   - ROS2 bridge publishes ROS2 topics to the local network
+   - ![image](https://github.com/user-attachments/assets/9d84639b-19e9-4fdf-a0d2-6564e592f56b)
+2. Update the `cyclonedds.xml` NetworkInterface name to the adapter you will be using
+3. Build
+4. Run
 
 ## Building
 
