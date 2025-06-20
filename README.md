@@ -11,6 +11,20 @@ Sample code to call the ros2 apis
 2. Update the `cyclonedds.xml` NetworkInterface name to the adapter you will be using
 3. Build
 4. Run
+5. Confirm the following ROS2 topics are visible `ros2 topic list`
+```
+/{BOT_ID}/ro1/can/send
+/{BOT_ID}/ro1/hardware/end_effector_imu
+/{BOT_ID}/ro1/hardware/jacobian
+/{BOT_ID}/ro1/hardware/joint_state
+/{BOT_ID}/ro1/hardware/joint_trajectory
+/{BOT_ID}/ro1/hardware/pose
+/{BOT_ID}/ro1/hardware/pose/write
+/{BOT_ID}/ro1/hardware/scaling_factor
+/{BOT_ID}/ro1/hardware/tooltip_velocity
+/{BOT_ID}/ro1/modbus/receive
+/{BOT_ID}/ro1/modbus/send
+```
 
 ## Building
 
