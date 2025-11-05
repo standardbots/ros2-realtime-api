@@ -13,10 +13,14 @@ RUN \
     ros-humble-moveit-msgs \
     ros-humble-control-msgs \
     ros-humble-sensor-msgs \
+    ros-humble-geometry-msgs \
     ros-humble-trajectory-msgs
 
 
 WORKDIR /app
+
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+RUN pip install standardbots
 
 RUN mkdir -p /etc/standardbots/configuration/
 COPY ./cyclonedds.xml /etc/standardbots/configuration/cyclonedds.xml
@@ -25,8 +29,7 @@ RUN source /opt/ros/humble/setup.bash && pip3 install rclpy
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV CYCLONEDDS_URI=/etc/standardbots/configuration/cyclonedds.xml
-
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+ENV ROS_DOMAIN_ID=1
 
 COPY ./src/* ./src/
 COPY ./data/* ./data/
