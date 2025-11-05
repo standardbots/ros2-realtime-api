@@ -94,8 +94,8 @@ if __name__ == "__main__":
     print('Connecting to robot: ', args.bot_id)
 
     sdk = StandardBotsRobot(
-        url='[ROBOT_URL]',
-        token='[ROBOT_TOKEN]',
+        url='<ROBOT_URL>',
+        token='<ROBOT_TOKEN>',
         robot_kind=StandardBotsRobot.RobotKind.Live,
     )
 

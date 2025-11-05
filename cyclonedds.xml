@@ -11,7 +11,8 @@
         <General>
             <AllowMulticast>spdp</AllowMulticast>
             <Interfaces>
-                <NetworkInterface name="internal0" priority="0" presence_required="true" />
+                <!-- change to the device name of the network adapter you want to use -->
+                <NetworkInterface name="ethernet0" priority="0" presence_required="true" />
             </Interfaces>
         </General>
         <Discovery>

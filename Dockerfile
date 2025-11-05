@@ -19,6 +19,9 @@ RUN \
 
 WORKDIR /app
 
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+RUN pip install standardbots
+
 RUN mkdir -p /etc/standardbots/configuration/
 COPY ./cyclonedds.xml /etc/standardbots/configuration/cyclonedds.xml
 
@@ -27,10 +30,6 @@ RUN source /opt/ros/humble/setup.bash && pip3 install rclpy
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV CYCLONEDDS_URI=/etc/standardbots/configuration/cyclonedds.xml
 ENV ROS_DOMAIN_ID=1
-
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-
-RUN pip install standardbots
 
 COPY ./src/* ./src/
 COPY ./data/* ./data/
