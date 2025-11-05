@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CycloneDDS xmlns="https://cdds.io/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"    xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
-    <Domain id="any">
+    <Domain id="0">
         <General>
-            <!-- Uncomment and update the name to the network adapter you will be using -->
-            <!-- <Interfaces>
-                <NetworkInterface name="external0" priority="0" />
-            </Interfaces> -->
+            <Interfaces>
+                <NetworkInterface name="lo" />
+            </Interfaces>
+       </General>
+    </Domain>
+    <Domain id="1">
+        <General>
+            <AllowMulticast>spdp</AllowMulticast>
+            <Interfaces>
+                <NetworkInterface name="internal0" priority="0" presence_required="true" />
+            </Interfaces>
         </General>
+        <Discovery>
+            <ParticipantIndex>auto</ParticipantIndex>
+        </Discovery>
     </Domain>
 </CycloneDDS>
