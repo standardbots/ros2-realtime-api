@@ -29,13 +29,24 @@ Sample code to call the ROS2 APIs.  By default we use cyclone dds implementation
 
 ### Run a different script
 
+
 ```
-./run.sh python3 ./src/write_poses.py --bot-id=<ROBOT_ID> ./data/pose1.log"
+./run.sh python3 ./src/detect_bot_id.py
+```
+
+```
+./run.sh python3 ./src/read_joint_states.py
 ```
 
 ## Run a shell in docker environement
 
+You can run an interactive shell in the docker container.  It will automatically set the correct permissions and set the domain id, as well as mount the current directory into the container
+
 1. `./run_shell.sh`
+
+### Run a script
 1. `python3 ./src/read_joint_states.py --bot-id=<ROBOT_ID>`
+
+### List the ROS2 topics
 1. `ros2 topic list`
 
