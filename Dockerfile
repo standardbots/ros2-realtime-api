@@ -13,6 +13,7 @@ RUN \
     ros-humble-moveit-msgs \
     ros-humble-control-msgs \
     ros-humble-sensor-msgs \
+    ros-humble-geometry-msgs \
     ros-humble-trajectory-msgs
 
 
