@@ -1,7 +1,7 @@
 # ROS Realtime API
-Sample code to call the ROS2 APIs.  By default we use cyclone dds implementation for the ROS2 networking.  Additionally, we use ROS_DOMAIN_ID=1 to expose the topics
+Sample code to call the ROS2 APIs.  By default we use cyclone dds implementation for the ROS2 networking.  Additionally, we use `ROS_DOMAIN_ID=1` to expose the topics
 
-## Setup
+# Robot Setup
 
 1. Clear any errors on the move page 
 1. Enable the ROS2 API and ROS2 Bridge features from the Standard Bots app 
@@ -11,6 +11,18 @@ Sample code to call the ROS2 APIs.  By default we use cyclone dds implementation
    - Turn the `Enable ROS2 bridge` on.  This enables the ROS2 topics to be published on the local network
    - ![image](https://github.com/user-attachments/assets/9d84639b-19e9-4fdf-a0d2-6564e592f56b)
 
+
+# Client Setup
+
+Next, we set up the client side to talk to the robot.  First you'll need to setup a machine on the same network that the robot is currently on.  Ethernet is preferred, but wifi will work as well.
+
+Next, we require docker to run the sample code.  We use docker to set up the ROS environment so that it can communication over the ROS2 protocols
+
+## Pull repository
+
+Download this repository on your machine.  
+
+`git clone git@github.com:standardbots/ros2-realtime-api.git`
 
 ## Building
 
@@ -67,15 +79,17 @@ You can also run an interactive shell in the docker container.  It will automati
 # Available ROS2 API / Topics
 
 - `/<BOT_ID>/ro1/hardware/end_effector_imu`
-  - end effector imu data
   - sensor_msgs/msg/Imu
 - `/<BOT_ID>/ro1/hardware/jacobian`
   - std_msgs/msg/Float64MultiArray
 - `/<BOT_ID>/ro1/hardware/joint_state`
+  - Read the current joint state of the arm
   - sensor_msgs/msg/JointState
 - `/<BOT_ID>/ro1/hardware/joint_trajectory`
+  - Write a joint trajectory for the arm to perform
   - trajectory_msgs/msg/JointTrajectory
 - `/<BOT_ID>/ro1/hardware/pose`
   - geometry_msgs/msg/PoseStamped
 - `/<BOT_ID>/ro1/hardware/pose/write`
+  - Read an write 
   - geometry_msgs/msg/PoseStamped
