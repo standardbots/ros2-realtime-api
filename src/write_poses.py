@@ -73,7 +73,7 @@ class WritePose(Node):
             pose_stamped.pose.orientation.y = self.start_pose.orientation.y
             pose_stamped.pose.orientation.z = self.start_pose.orientation.z
 
-            pose_stamped.pose.position.z = self.start_pose.position.z - i * 0.001
+            pose_stamped.pose.position.z = self.start_pose.position.z + i * 0.001
 
             self.publisher.publish(pose_stamped)
 
@@ -83,8 +83,19 @@ class WritePose(Node):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Write poses to a robot')
-    parser.add_argument('--bot-id', type=str, help='Robot ID to write poses to')
+    parser.add_argument('--bot-id', dest='bot_id', type=str, help='Robot ID to write poses to')
+    parser.add_argument('--url', dest='robot_url', type=str, help='Robot URL to write poses to')
+    parser.add_argument('--token', dest='robot_token', type=str, help='Robot api token to write poses to')
     args = parser.parse_args()
+
+    if args.robot_url is None:
+        args.robot_url = os.getenv('ROBOT_URL')
+    if args.robot_token is None:
+        args.robot_token = os.getenv('ROBOT_TOKEN')
+
+    if args.robot_url is None or args.robot_token is None:
+        print("Error: Robot URL and token are required")
+        sys.exit(1)
 
     rclpy.init()
 
@@ -94,8 +105,8 @@ if __name__ == "__main__":
     print('Connecting to robot: ', args.bot_id)
 
     sdk = StandardBotsRobot(
-        url='<ROBOT_URL>',
-        token='<ROBOT_TOKEN>',
+        url=args.robot_url,
+        token=args.robot_token,
         robot_kind=StandardBotsRobot.RobotKind.Live,
     )
 
@@ -121,9 +132,18 @@ if __name__ == "__main__":
     try:
         print("Spinning...")
         write_pose_node.start()
-        rclpy.spin(write_pose_node)
     except KeyboardInterrupt:
         print("KeyboardInterrupt received. Shutting down...")
     finally:
         print("Cleaning up...")
         rclpy.shutdown()
+
+        with sdk.connection():
+            sdk.ros.control.update_ros_control_state(
+                models.ROSControlUpdateRequest(
+                    action=models.ROSControlStateEnum.Disabled,
+                )
+            )
+
+            print('Control state set to disabled')
+
