@@ -59,8 +59,12 @@ The default script will auto detect the bot id and then just read and print out 
 ```
 
 #### Move the robot down from current position
+
+We need to explicitly use the SDK to unbrake and enable the ROS2, so we need the url and api token.
+These can be obtained from the developer api menu, under menu -> settings -> configure developer api
+
 ```
-./run.sh python3 ./src/write_poses.py
+./run.sh python3 ./src/write_poses.py --bot-id=<BOT_ID> --token=<TOKEN> --url=<REMOTE_ROBOT_URL>
 ```
 
 ## Run a shell in docker environement
