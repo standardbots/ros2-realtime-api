@@ -32,6 +32,5 @@ ENV CYCLONEDDS_URI=/etc/standardbots/configuration/cyclonedds.xml
 ENV ROS_DOMAIN_ID=1
 
 COPY ./src/* ./src/
-COPY ./data/* ./data/
 
 CMD [ "python3", "src/read_joint_states.py" ]
