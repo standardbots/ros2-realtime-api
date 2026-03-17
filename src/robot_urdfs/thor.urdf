@@ -1,0 +1,448 @@
+<?xml version="1.0" ?>
+<robot name="sbot">
+  <!-- create link fixed to the "world" -->
+  <link name="world"/>
+  <!-- Load robot's macro with parameters -->
+  <!-- set prefix if multiple robots are used -->
+  <!-- LINKS -->
+  <!-- base_link -->
+  <link name="base_link">
+    <inertial>
+      <mass value="5.2427"/>
+      <origin rpy="0 0 0" xyz="-5.2124e-05 -0.0021174 0.031226"/>
+      <inertia ixx="0.024821" ixy="3.5222e-05" ixz="6.9549e-07" iyy="0.026178" iyz="-4.7606e-05" izz="0.04672"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/visual/base_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="base_link_color">
+        <color rgba="0.86667 0.86667 0.8902 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/collision/base_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- shoulder_link -->
+  <link name="shoulder_link">
+    <inertial>
+      <mass value="20.461"/>
+      <origin rpy="0 0 0" xyz="-7.8196e-07 -0.0079685 -0.028423"/>
+      <inertia ixx="0.17618" ixy="1.1855e-06" ixz="3.5163e-06" iyy="0.17361" iyz="0.0038017" izz="0.14712"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/visual/shoulder_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="shoulder_link_color">
+        <color rgba="0.866666666666667 0.866666666666667 0.890196078431372 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/collision/shoulder_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="upper_arm_link">
+    <inertial>
+      <mass value="41.527"/>
+      <origin rpy="0 0 0" xyz="1.5638e-06 0.011572 0.41622"/>
+      <inertia ixx="9.586" ixy="9.6253e-06" ixz="-1.4477e-05" iyy="9.5252" iyz="0.22908" izz="0.3013"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/visual/upper_arm_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="upper_arm_link_color">
+        <color rgba="0.86667 0.86667 0.8902 1"/>
+      </material>
+    </visual>
+    <collision>
+      <!-- Adjust for offset for scaling (link_length * 0.05) / 2 = (0.5907 * 0.05 ) / 2 -->
+      <origin rpy="0 0 0" xyz="0 0 -0.02562500000000002"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/collision/upper_arm_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- forearm_link -->
+  <link name="forearm_link">
+    <inertial>
+      <mass value="7.92061254984345"/>
+      <origin rpy="0 0 0" xyz="7.25188680236915e-07 0.00422922279637755 0.545698081250078"/>
+      <inertia ixx="0.486787577845494" ixy="3.58166576763563e-07" ixz="4.02995589109446e-06" iyy="0.484019947089421" iyz="-0.0264957203623913" izz="0.0215157772314222"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/visual/forearm_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="forearm_link_color">
+        <color rgba="0.866666666666667 0.866666666666667 0.890196078431372 1"/>
+      </material>
+    </visual>
+    <collision>
+      <!-- Adjust for offset for scaling (link_length * 0.05) / 2 = (0.5495 * 0.05 ) / 2 -->
+      <origin rpy="0 0 0" xyz="0 0 -0.020425000001846716"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/collision/forearm_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- wrist_1_link -->
+  <link name="wrist_1_link">
+    <inertial>
+      <mass value="3.81363816222914"/>
+      <origin rpy="0 0 0" xyz="-4.02091368331366e-07 -0.00317541546837682 0.0332634651159762"/>
+      <inertia ixx="0.0102121660397854" ixy="-3.59136809661935e-07" ixz="-5.21667847736621e-07" iyy="0.0100941476379524" iyz="-0.000336752719225966" izz="0.00724123650857689"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/visual/wrist_1_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="wrist_1_link_color">
+        <color rgba="0.866666666666667 0.866666666666667 0.890196078431372 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/collision/wrist_1_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- wrist_2_link -->
+  <link name="wrist_2_link">
+    <inertial>
+      <mass value="3.8149"/>
+      <origin rpy="0 0 0" xyz="2.5298e-07 0.03335 -0.0031461"/>
+      <inertia ixx="0.010188" ixy="5.2379e-07" ixz="3.7268e-07" iyy="0.0072448" iyz="-0.00032615" izz="0.010073"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/visual/wrist_2_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="wrist_2_link_color">
+        <color rgba="0.866666666666667 0.866666666666667 0.890196078431372 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/collision/wrist_2_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- wrist_3_link -->
+  <link name="wrist_3_link">
+    <inertial>
+      <mass value="0.81678"/>
+      <origin rpy="0 0 0" xyz="-9.7744e-05 -0.027224 0.00061858"/>
+      <inertia ixx="0.00079314" ixy="-1.1189e-06" ixz="-7.8547e-07" iyy="0.001295" iyz="-1.0807e-06" izz="0.00079676"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/visual/wrist_3_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="wrist_3_link_color">
+        <color rgba="0.8902 0.8902 0.91373 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/collision/wrist_3_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- wrist_3_cable_link -->
+  <link name="wrist_3_cable_link">
+    <inertial>
+      <mass value="0.0080607"/>
+      <origin rpy="0 0 0" xyz="0.019129 0.02812 0.040316"/>
+      <inertia ixx="1.4286e-05" ixy="3.3605e-06" ixz="-2.5233e-06" iyy="9.3785e-06" iyz="5.8377e-06" izz="9.3754e-06"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/collision/wrist_3_cable_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="wrist_3_cable_link_color">
+        <color rgba="0.25098 0.25098 0.25098 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/thor/collision/wrist_3_cable_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- All-zero tool frame. This frame should correspond to the TOOL frame of the robot's controller.) -->
+  <link name="tool0"/>
+  <!-- tool link -->
+  <!-- START Delete if not needed -->
+  <!-- Standard frames for industrial robots. Also useful for manipulators.
+         (ROS-I specs - https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages#Standardised_links_.2F_frames)-->
+  <!-- This frame should correspond to the BASE coordinate system of robot's controller.) -->
+  <link name="base"/>
+  <!-- Frame for mounting EEF models to a manipulator. x+ axis points forward (REP 103). -->
+  <link name="flange"/>
+  <!-- END Delete if not needed  -->
+  <!-- END LINKS -->
+  <!-- JOINTS -->
+  <!-- base_joint fixes base_link to the environment -->
+  <joint name="base_joint" type="fixed">
+    <origin rpy="0 0 -1.5707963267948966" xyz="0 0 0"/>
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+  <!-- joint 0 -->
+  <joint name="joint0" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.1945"/>
+    <parent link="base_link"/>
+    <child link="shoulder_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="346.0" lower="-6.283185307179586" upper="6.283185307179586" velocity="4.71238898038469"/>
+  </joint>
+  <!-- joint 1 -->
+  <joint name="joint1" type="revolute">
+    <origin rpy="0 0 0" xyz="0.255000000000002 0 0"/>
+    <parent link="shoulder_link"/>
+    <child link="upper_arm_link"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="346.0" lower="-2.356194490192345" upper="2.356194490192345" velocity="4.71238898038469"/>
+  </joint>
+  <!-- joint 2 -->
+  <joint name="joint2" type="revolute">
+    <origin rpy="0 0 0" xyz="-0.197750000000425 0 1.025"/>
+    <parent link="upper_arm_link"/>
+    <child link="forearm_link"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="163.0" lower="-3.141592653589793" upper="3.141592653589793" velocity="5.026548245743669"/>
+  </joint>
+  <!-- joint 3 -->
+  <joint name="joint3" type="revolute">
+    <origin rpy="0 0 0" xyz="-0.158000000073582 0 0.817000000073868"/>
+    <parent link="forearm_link"/>
+    <child link="wrist_1_link"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="63.0" lower="-6.283185307179586" upper="6.283185307179586" velocity="6.806784082777885"/>
+  </joint>
+  <!-- joint 4 -->
+  <joint name="joint4" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.158000000074006"/>
+    <parent link="wrist_1_link"/>
+    <child link="wrist_2_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="63.0" lower="-6.283185307179586" upper="6.283185307179586" velocity="6.806784082777885"/>
+  </joint>
+  <!-- joint 5 -->
+  <joint name="joint5" type="revolute">
+    <origin rpy="0 0 0" xyz="-0.148698878000135 0 0"/>
+    <parent link="wrist_2_link"/>
+    <child link="wrist_3_link"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="63.0" lower="-6.283185307179586" upper="6.283185307179586" velocity="6.806784082777885"/>
+  </joint>
+  <!-- tool frame - fixed frame -->
+  <joint name="joint5-tool0" type="fixed">
+    <parent link="wrist_3_link"/>
+    <child link="tool0"/>
+    <origin rpy="1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
+  </joint>
+  <joint name="joint5_cable" type="fixed">
+    <parent link="wrist_3_link"/>
+    <child link="wrist_3_cable_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+  <!-- END JOINTS -->
+  <!-- START Delete if not needed -->
+  <!-- Standard frames for industrial robots. Also useful for manipulators.
+         (ROS-I specs - https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages#Standardised_links_.2F_frames)-->
+  <joint name="base_link-base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="base"/>
+  </joint>
+  <joint name="tool0-flange_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="tool0"/>
+    <child link="flange"/>
+  </joint>
+  <link name="eef_collision">
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.07825"/>
+      <geometry>
+        <box size="0.1246 0.1046 0.1565"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="tool0-eef_collision" type="fixed">
+    <parent link="tool0"/>
+    <child link="eef_collision"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+  <!-- END Delete if not needed  -->
+  <ros2_control name="sbot" type="system">
+    <hardware>
+      <plugin>standard_bots_hardware_interface/SbotHW</plugin>
+      <!-- for SbotHW, temporarily hard-code speed scaling like this. Change later. -->
+      <param name="initial_speed_scaling_factor">1.0</param>
+    </hardware>
+    <joint name="joint0">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-6.28</param>
+        <param name="max">6.28</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint1">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-2.35</param>
+        <param name="max">2.35</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint2">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-3.14</param>
+        <param name="max">3.14</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint3">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-6.28</param>
+        <param name="max">6.28</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint4">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-6.28</param>
+        <param name="max">6.28</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint5">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-6.28</param>
+        <param name="max">6.28</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <sensor name="tcp_fts_sensor">
+      <!-- Remove/change sensors as needed -->
+      <state_interface name="force.x"/>
+      <state_interface name="force.y"/>
+      <state_interface name="force.z"/>
+      <state_interface name="torque.x"/>
+      <state_interface name="torque.y"/>
+      <state_interface name="torque.z"/>
+      <param name="frame_id">tool0</param>
+      <!-- Change sensors as needed -->
+      <param name="min_fx">-100</param>
+      <param name="max_fx">100</param>
+      <param name="min_fy">-100</param>
+      <param name="max_fy">100</param>
+      <param name="min_fz">-200</param>
+      <param name="max_fz">200</param>
+      <param name="min_tx">-10</param>
+      <param name="max_tx">10</param>
+      <param name="min_ty">-10</param>
+      <param name="max_ty">10</param>
+      <param name="min_tz">-15</param>
+      <param name="max_tz">15</param>
+    </sensor>
+  </ros2_control>
+  <link name="scene_environment">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 -0.13125"/>
+      <geometry>
+        <box size="4.3 4.3 0.25"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 -0.13125"/>
+      <geometry>
+        <box size="4.3 4.3 0.25"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 0.1"/>
+      </material>
+    </visual>
+  </link>
+  <joint name="base_to_scene" type="fixed">
+    <parent link="base_link"/>
+    <child link="scene_environment"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+</robot>

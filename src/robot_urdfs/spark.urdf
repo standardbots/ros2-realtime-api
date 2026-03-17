@@ -1,0 +1,448 @@
+<?xml version="1.0" ?>
+<robot name="sbot">
+  <!-- create link fixed to the "world" -->
+  <link name="world"/>
+  <!-- Load robot's macro with parameters -->
+  <!-- set prefix if multiple robots are used -->
+  <!-- LINKS -->
+  <!-- base_link -->
+  <link name="base_link">
+    <inertial>
+      <mass value="1.0379"/>
+      <origin rpy="0 0 0" xyz="-1.2e-06 0.00023629 0.018571"/>
+      <inertia ixx="0.0014175" ixy="-1.7148e-10" ixz="2.6418e-08" iyy="0.0013889" iyz="-1.0015e-06" izz="0.0025205"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/visual/base_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="base_link_color">
+        <color rgba="0.79216 0.81961 0.93333 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/collision/base_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- shoulder_link -->
+  <link name="shoulder_link">
+    <inertial>
+      <mass value="3.4455"/>
+      <origin rpy="0 0 0" xyz="1.4292e-07 -0.0027775 -0.026716"/>
+      <inertia ixx="0.0081123" ixy="5.7493e-07" ixz="-8.3042e-07" iyy="0.0080601" iyz="0.00014809" izz="0.0068364"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/visual/shoulder_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="shoulder_link_color">
+        <color rgba="0.79216 0.81961 0.93333 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/collision/shoulder_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="upper_arm_link">
+    <inertial>
+      <mass value="7.5294"/>
+      <origin rpy="0 0 0" xyz="-3.6365e-07 0.0056535 0.18226"/>
+      <inertia ixx="0.23339" ixy="-1.126e-07" ixz="2.6159e-06" iyy="0.22923" iyz="0.007371" izz="0.014481"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/visual/upper_arm_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="upper_arm_link_color">
+        <color rgba="0.15686 0.15686 0.15686 1"/>
+      </material>
+    </visual>
+    <collision>
+      <!-- Adjust for offset for scaling (link_length * 0.05) / 2 = (0.5907 * 0.05 ) / 2 -->
+      <origin rpy="0 0 0" xyz="0 0 -0.01192500000000001"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/collision/upper_arm_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- forearm_link -->
+  <link name="forearm_link">
+    <inertial>
+      <mass value="2.774"/>
+      <origin rpy="0 0 0" xyz="-6.9079e-07 0.0043864 0.26244"/>
+      <inertia ixx="0.030929" ixy="1.6466e-07" ixz="-2.0115e-08" iyy="0.029859" iyz="-0.0019511" izz="0.0039521"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/visual/forearm_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="forearm_link_color">
+        <color rgba="0.15686 0.15686 0.15686 1"/>
+      </material>
+    </visual>
+    <collision>
+      <!-- Adjust for offset for scaling (link_length * 0.05) / 2 = (0.5495 * 0.05 ) / 2 -->
+      <origin rpy="0 0 0" xyz="0 0 -0.008737500000000007"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/collision/forearm_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- wrist_1_link -->
+  <link name="wrist_1_link">
+    <inertial>
+      <mass value="1.7146"/>
+      <origin rpy="0 0 0" xyz="6.9002e-07 -0.0037103 0.025602"/>
+      <inertia ixx="0.0026207" ixy="-2.0184e-07" ixz="-2.4437e-07" iyy="0.0025211" iyz="-0.00015044" izz="0.0018198"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/visual/wrist_1_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="wrist_1_link_color">
+        <color rgba="0.86667 0.86667 0.8902 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/collision/wrist_1_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- wrist_2_link -->
+  <link name="wrist_2_link">
+    <inertial>
+      <mass value="1.7146"/>
+      <origin rpy="0 0 0" xyz="-6.9002e-07 0.025602 -0.0037103"/>
+      <inertia ixx="0.0026207" ixy="2.4437e-07" ixz="2.0184e-07" iyy="0.0018198" iyz="-0.00015044" izz="0.0025211"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/visual/wrist_2_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="wrist_2_link_color">
+        <color rgba="0.86667 0.86667 0.8902 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/collision/wrist_2_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- wrist_3_link -->
+  <link name="wrist_3_link">
+    <inertial>
+      <mass value="0.52964"/>
+      <origin rpy="0 0 0" xyz="7.9326e-05 -0.032667 9.8043e-05"/>
+      <inertia ixx="0.00037393" ixy="2.9356e-07" ixz="-2.0623e-06" iyy="0.00046115" iyz="1.0242e-07" izz="0.00036653"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/visual/wrist_3_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="wrist_3_link_color">
+        <color rgba="0.86667 0.86667 0.8902 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/collision/wrist_3_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- wrist_3_cable_link -->
+  <link name="wrist_3_cable_link">
+    <inertial>
+      <mass value="0.0080607"/>
+      <origin rpy="0 0 0" xyz="0.019129 0.02812 0.040316"/>
+      <inertia ixx="1.4286e-05" ixy="3.3605e-06" ixz="-2.5233e-06" iyy="9.3785e-06" iyz="5.8377e-06" izz="9.3754e-06"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/visual/wrist_3_cable_link.STL" scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="wrist_3_cable_link_color">
+        <color rgba="0.25098 0.25098 0.25098 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://standard_bots_description/meshes/sbot/spark/collision/wrist_3_cable_link.STL" scale="1.05 1.05 1.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- All-zero tool frame. This frame should correspond to the TOOL frame of the robot's controller.) -->
+  <link name="tool0"/>
+  <!-- tool link -->
+  <!-- START Delete if not needed -->
+  <!-- Standard frames for industrial robots. Also useful for manipulators.
+         (ROS-I specs - https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages#Standardised_links_.2F_frames)-->
+  <!-- This frame should correspond to the BASE coordinate system of robot's controller.) -->
+  <link name="base"/>
+  <!-- Frame for mounting EEF models to a manipulator. x+ axis points forward (REP 103). -->
+  <link name="flange"/>
+  <!-- END Delete if not needed  -->
+  <!-- END LINKS -->
+  <!-- JOINTS -->
+  <!-- base_joint fixes base_link to the environment -->
+  <joint name="base_joint" type="fixed">
+    <origin rpy="0 0 -1.5707963267948966" xyz="0 0 0"/>
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+  <!-- joint 0 -->
+  <joint name="joint0" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.11325"/>
+    <parent link="base_link"/>
+    <child link="shoulder_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="346.0" lower="-6.283185307179586" upper="6.283185307179586" velocity="4.71238898038469"/>
+  </joint>
+  <!-- joint 1 -->
+  <joint name="joint1" type="revolute">
+    <origin rpy="0 0 0" xyz="0.1569 0 0"/>
+    <parent link="shoulder_link"/>
+    <child link="upper_arm_link"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="346.0" lower="-2.356194490192345" upper="2.356194490192345" velocity="4.71238898038469"/>
+  </joint>
+  <!-- joint 2 -->
+  <joint name="joint2" type="revolute">
+    <origin rpy="0 0 0" xyz="-0.126 0 0.477"/>
+    <parent link="upper_arm_link"/>
+    <child link="forearm_link"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="163.0" lower="-2.8797932657906435" upper="2.8797932657906435" velocity="5.026548245743669"/>
+  </joint>
+  <!-- joint 3 -->
+  <joint name="joint3" type="revolute">
+    <origin rpy="0 0 0" xyz="-0.12275 0 0.3495"/>
+    <parent link="forearm_link"/>
+    <child link="wrist_1_link"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="63.0" lower="-6.283185307179586" upper="6.283185307179586" velocity="6.806784082777885"/>
+  </joint>
+  <!-- joint 4 -->
+  <joint name="joint4" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.12275"/>
+    <parent link="wrist_1_link"/>
+    <child link="wrist_2_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="63.0" lower="-6.283185307179586" upper="6.283185307179586" velocity="6.806784082777885"/>
+  </joint>
+  <!-- joint 5 -->
+  <joint name="joint5" type="revolute">
+    <origin rpy="0 0 0" xyz="-0.1343 0 0"/>
+    <parent link="wrist_2_link"/>
+    <child link="wrist_3_link"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="63.0" lower="-6.283185307179586" upper="6.283185307179586" velocity="6.806784082777885"/>
+  </joint>
+  <!-- tool frame - fixed frame -->
+  <joint name="joint5-tool0" type="fixed">
+    <parent link="wrist_3_link"/>
+    <child link="tool0"/>
+    <origin rpy="1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
+  </joint>
+  <joint name="joint5_cable" type="fixed">
+    <parent link="wrist_3_link"/>
+    <child link="wrist_3_cable_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+  <!-- END JOINTS -->
+  <!-- START Delete if not needed -->
+  <!-- Standard frames for industrial robots. Also useful for manipulators.
+         (ROS-I specs - https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages#Standardised_links_.2F_frames)-->
+  <joint name="base_link-base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="base"/>
+  </joint>
+  <joint name="tool0-flange_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="tool0"/>
+    <child link="flange"/>
+  </joint>
+  <link name="eef_collision">
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.07825"/>
+      <geometry>
+        <box size="0.1246 0.1046 0.1565"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="tool0-eef_collision" type="fixed">
+    <parent link="tool0"/>
+    <child link="eef_collision"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+  <!-- END Delete if not needed  -->
+  <ros2_control name="sbot" type="system">
+    <hardware>
+      <plugin>standard_bots_hardware_interface/SbotHW</plugin>
+      <!-- for SbotHW, temporarily hard-code speed scaling like this. Change later. -->
+      <param name="initial_speed_scaling_factor">1.0</param>
+    </hardware>
+    <joint name="joint0">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-6.28</param>
+        <param name="max">6.28</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint1">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-2.35</param>
+        <param name="max">2.35</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint2">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-3.14</param>
+        <param name="max">3.14</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint3">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-6.28</param>
+        <param name="max">6.28</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint4">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-6.28</param>
+        <param name="max">6.28</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <joint name="joint5">
+      <command_interface name="position">
+        <!-- Add/Remove interfaces as needed -->
+        <param name="min">-6.28</param>
+        <param name="max">6.28</param>
+      </command_interface>
+      <command_interface name="velocity"/>
+      <!-- Add/Remove interfaces as needed -->
+      <command_interface name="acceleration"/>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="acceleration"/>
+      <state_interface name="effort"/>
+    </joint>
+    <sensor name="tcp_fts_sensor">
+      <!-- Remove/change sensors as needed -->
+      <state_interface name="force.x"/>
+      <state_interface name="force.y"/>
+      <state_interface name="force.z"/>
+      <state_interface name="torque.x"/>
+      <state_interface name="torque.y"/>
+      <state_interface name="torque.z"/>
+      <param name="frame_id">tool0</param>
+      <!-- Change sensors as needed -->
+      <param name="min_fx">-100</param>
+      <param name="max_fx">100</param>
+      <param name="min_fy">-100</param>
+      <param name="max_fy">100</param>
+      <param name="min_fz">-200</param>
+      <param name="max_fz">200</param>
+      <param name="min_tx">-10</param>
+      <param name="max_tx">10</param>
+      <param name="min_ty">-10</param>
+      <param name="max_ty">10</param>
+      <param name="min_tz">-15</param>
+      <param name="max_tz">15</param>
+    </sensor>
+  </ros2_control>
+  <link name="scene_environment">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 -0.13125"/>
+      <geometry>
+        <box size="0.215 0.215 0.25"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 -0.13125"/>
+      <geometry>
+        <box size="0.215 0.215 0.25"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 0.1"/>
+      </material>
+    </visual>
+  </link>
+  <joint name="base_to_scene" type="fixed">
+    <parent link="base_link"/>
+    <child link="scene_environment"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+</robot>
