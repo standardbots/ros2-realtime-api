@@ -92,6 +92,7 @@ You can also run an interactive shell in the docker container.  It will automati
 - `/<BOT_ID>/ro1/hardware/joint_trajectory`
   - Write a joint trajectory for the arm to perform
   - trajectory_msgs/msg/JointTrajectory
+  - **Note on API Behavior:** This topic currently processes one trajectory point at a time. To execute a smooth path, developers must develop a controller that publishes sparse, timestamped joint states sequentially rather than sending a full trajectory array at once.
 - `/<BOT_ID>/ro1/hardware/pose`
   - geometry_msgs/msg/PoseStamped
 - `/<BOT_ID>/ro1/hardware/pose/write`
