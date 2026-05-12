@@ -17,9 +17,9 @@ from standardbots import StandardBotsRobot, models
 from detect_bot_id import detect_bot_id
 from read_joint_states import ReadJointState
 
-class WritePose(Node):
+class MoveSquare(Node):
     def __init__(self, robot_id: str | None = None):
-        super().__init__(f"write_pose")
+        super().__init__(f"move_square")
 
         if robot_id is None:
             self.robot_id = detect_bot_id()
@@ -63,8 +63,12 @@ class WritePose(Node):
 
         print("Moving to end pose")
 
-        side_steps = 100
-        step = 0.00025
+        side_distance = 0.1
+        side_duration = 2.0
+        rate_hz = 100.0
+        period = 1.0 / rate_hz
+        side_steps = int(side_duration * rate_hz)
+        step = side_distance / side_steps
         # Square in XY plane: +x, +y, -x, -y back to start
         sides = [
             (step, 0.0),
@@ -73,6 +77,7 @@ class WritePose(Node):
             (0.0, -step),
         ]
 
+        next_t = time.monotonic()
         for cycle in range(10):
             dx, dy = 0.0, 0.0
             for side_idx, (sx, sy) in enumerate(sides):
@@ -82,6 +87,7 @@ class WritePose(Node):
 
                     pose_stamped = PoseStamped()
                     pose_stamped.header.frame_id = "world"
+                    pose_stamped.header.stamp = self.get_clock().now().to_msg()
 
                     pose_stamped.pose.position.x = self.start_pose.position.x + dx
                     pose_stamped.pose.position.y = self.start_pose.position.y + dy
@@ -93,8 +99,16 @@ class WritePose(Node):
 
                     self.publisher.publish(pose_stamped)
 
-                    print(f"Cycle {cycle} side {side_idx} step {i}")
-                    rclpy.spin_once(self, timeout_sec=0.1)
+                    if i % 50 == 0:
+                        print(f"Cycle {cycle} side {side_idx} step {i}")
+
+                    next_t += period
+                    sleep_for = next_t - time.monotonic()
+                    if sleep_for > 0:
+                        time.sleep(sleep_for)
+                    else:
+                        # Fell behind — resync deadline so we don't burst-catch-up.
+                        next_t = time.monotonic()
         
 
 
@@ -144,11 +158,11 @@ if __name__ == "__main__":
         time.sleep(0.5)
         print('Control state set to API')
 
-    write_pose_node = WritePose(robot_id=args.bot_id)
+    move_square_node = MoveSquare(robot_id=args.bot_id)
 
     try:
         print("Spinning...")
-        write_pose_node.start()
+        move_square_node.start()
     except KeyboardInterrupt:
         print("KeyboardInterrupt received. Shutting down...")
     finally:

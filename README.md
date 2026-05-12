@@ -64,7 +64,7 @@ We need to explicitly use the SDK to unbrake and enable the ROS2, so we need the
 These can be obtained from the developer api menu, under menu -> settings -> configure developer api
 
 ```
-./run.sh python3 ./src/write_poses.py --bot-id=<BOT_ID> --token=<TOKEN> --url=<REMOTE_ROBOT_URL>
+./run.sh python3 ./src/move_square.py --bot-id=<BOT_ID> --token=<TOKEN> --url=<REMOTE_ROBOT_URL>
 ```
 
 ## Run a shell in docker environement
