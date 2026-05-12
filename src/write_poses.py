@@ -1,6 +1,7 @@
 import time
 import rclpy
 import json
+import os
 import sys
 import argparse
 import time
@@ -61,24 +62,40 @@ class WritePose(Node):
         print(self.start_pose)
 
         print("Moving to end pose")
-        for i in range(100):
-            pose_stamped = PoseStamped()
-            pose_stamped.header.frame_id = "world"
 
-            pose_stamped.pose.position.x = self.start_pose.position.x
-            pose_stamped.pose.position.y = self.start_pose.position.y
-            pose_stamped.pose.position.z = self.start_pose.position.z
-            pose_stamped.pose.orientation.w = self.start_pose.orientation.w
-            pose_stamped.pose.orientation.x = self.start_pose.orientation.x
-            pose_stamped.pose.orientation.y = self.start_pose.orientation.y
-            pose_stamped.pose.orientation.z = self.start_pose.orientation.z
+        side_steps = 100
+        step = 0.00025
+        # Square in XY plane: +x, +y, -x, -y back to start
+        sides = [
+            (step, 0.0),
+            (0.0, step),
+            (-step, 0.0),
+            (0.0, -step),
+        ]
 
-            pose_stamped.pose.position.z = self.start_pose.position.z + i * 0.001
+        for cycle in range(10):
+            dx, dy = 0.0, 0.0
+            for side_idx, (sx, sy) in enumerate(sides):
+                for i in range(side_steps):
+                    dx += sx
+                    dy += sy
 
-            self.publisher.publish(pose_stamped)
+                    pose_stamped = PoseStamped()
+                    pose_stamped.header.frame_id = "world"
 
-            print(f"Published pose {i}")
-            rclpy.spin_once(self, timeout_sec=0.2)
+                    pose_stamped.pose.position.x = self.start_pose.position.x + dx
+                    pose_stamped.pose.position.y = self.start_pose.position.y + dy
+                    pose_stamped.pose.position.z = self.start_pose.position.z
+                    pose_stamped.pose.orientation.w = self.start_pose.orientation.w
+                    pose_stamped.pose.orientation.x = self.start_pose.orientation.x
+                    pose_stamped.pose.orientation.y = self.start_pose.orientation.y
+                    pose_stamped.pose.orientation.z = self.start_pose.orientation.z
+
+                    self.publisher.publish(pose_stamped)
+
+                    print(f"Cycle {cycle} side {side_idx} step {i}")
+                    rclpy.spin_once(self, timeout_sec=0.1)
+        
 
 
 if __name__ == "__main__":
