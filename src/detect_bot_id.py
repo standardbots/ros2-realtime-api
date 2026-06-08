@@ -17,12 +17,21 @@ def detect_bot_id(node: Node = None, timeout: int = 10):
         rclpy.spin_once(node, timeout_sec=1.0)    
 
 def parse_bot_id(node: Node):
+    # Match either the hardware bridge joint_state or the external-control
+    # bridge robot_joints topic, so detection works regardless of which
+    # bridge is currently up.
+    patterns = (
+        '/([^/]*)/ro1/hardware/joint_state',
+        '/([^/]*)/external/robot_joints',
+    )
+
     topic_names_and_types = node.get_topic_names_and_types()
     for topic_name, _ in topic_names_and_types:
-        match = re.match('/([^/]*)/ro1/hardware/joint_state', topic_name)
-        if match:
-            return match.group(1)
-        
+        for pattern in patterns:
+            match = re.match(pattern, topic_name)
+            if match:
+                return match.group(1)
+
     return None
 
 if __name__ == "__main__":

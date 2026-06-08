@@ -67,6 +67,40 @@ These can be obtained from the developer api menu, under menu -> settings -> con
 ./run.sh python3 ./src/write_poses.py --bot-id=<BOT_ID> --token=<TOKEN> --url=<REMOTE_ROBOT_URL>
 ```
 
+#### Stream commands over the external-control bridge
+
+These scripts drive the robot through the external-control bridge (the "ROS Humble streaming" path) rather than the `/ro1/hardware` topics.
+
+Prerequisites:
+- A ROS Humble streaming session must be active so the bridge is up and engaged: menu -> Settings -> External Control -> Streaming -> Start (Controlled By = ROS Humble), or an External Control step with Controlled By = ROS Humble.
+- The arm must be unbraked to actually move.
+
+Each script auto-detects the bot id (or pass `--bot-id=<BOT_ID>`) and reads the current pose / joint state off the bridge, so streams always start from the live configuration.
+
+Nudge the tooltip +Z 2cm and back:
+
+```
+./run.sh python3 ./src/stream_pose.py
+```
+
+Rotate J4 & J5 +0.1 rad and back (direct joint stream):
+
+```
+./run.sh python3 ./src/stream_joints.py
+```
+
+Rotate J4 & J5 +0.1 rad via a timed joint trajectory:
+
+```
+./run.sh python3 ./src/stream_joint_trajectory.py
+```
+
+Open -> closed -> open the gripper:
+
+```
+./run.sh python3 ./src/stream_gripper.py
+```
+
 ## Run a shell in docker environement
 
 You can also run an interactive shell in the docker container.  It will automatically set the correct permissions and set the domain id, as well as mount the current directory into the container.  You can use this iteratively develop a script while running an set up environment
@@ -97,3 +131,26 @@ You can also run an interactive shell in the docker container.  It will automati
 - `/<BOT_ID>/ro1/hardware/pose/write`
   - Read an write 
   - geometry_msgs/msg/PoseStamped
+
+# External-control bridge topics (ROS Humble streaming)
+
+These topics are published under `/<BOT_ID>/external` while a ROS Humble streaming session is active (see "Stream commands over the external-control bridge" above). The robot's current state is republished live so streams can start from the current configuration.
+
+- `/<BOT_ID>/external/robot_pose`
+  - Current tooltip pose (read)
+  - geometry_msgs/msg/PoseStamped
+- `/<BOT_ID>/external/pose`
+  - Stream a target tooltip pose (write)
+  - geometry_msgs/msg/PoseStamped
+- `/<BOT_ID>/external/robot_joints`
+  - Current joint state (read)
+  - sensor_msgs/msg/JointState
+- `/<BOT_ID>/external/joints`
+  - Stream target joint positions (write)
+  - sensor_msgs/msg/JointState
+- `/<BOT_ID>/external/trajectory`
+  - Stream a joint trajectory (write)
+  - trajectory_msgs/msg/JointTrajectory
+- `/<BOT_ID>/external/gripper`
+  - Stream a gripper command `[position 0..1, velocity 0..1]` (write)
+  - std_msgs/msg/Float64MultiArray
