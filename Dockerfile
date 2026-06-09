@@ -30,6 +30,8 @@ RUN source /opt/ros/humble/setup.bash && pip3 install rclpy
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV CYCLONEDDS_URI=/etc/standardbots/configuration/cyclonedds.xml
 ENV ROS_DOMAIN_ID=1
+# Flush stdout/stderr in real time instead of block-buffering (no TTY under `docker run`)
+ENV PYTHONUNBUFFERED=1
 
 COPY ./src/* ./src/
 
