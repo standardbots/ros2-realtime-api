@@ -33,8 +33,9 @@ URDF_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_urdfs
 # FK error above MAX_FK_ERROR means it failed to converge (usually a cube
 # corner outside the reachable workspace at the fixed orientation). Streaming
 # either would command a violent or wrong move, so we refuse instead.
-MAX_JOINT_STEP = 0.03  # rad between consecutive setpoints
-MAX_FK_ERROR = 0.005   # m between requested and solved tooltip position
+MAX_JOINT_STEP = 0.03       # rad between consecutive setpoints
+MAX_FK_ERROR = 0.005        # m between requested and solved tooltip position
+MAX_JOINT_VELOCITY = 1.0    # rad/s anywhere in the precomputed trajectory
 
 
 def load_chain(robot: str) -> Chain:
@@ -140,6 +141,18 @@ def solve_joint_trajectory(chain, start_joints, points, rate):
     dt = 1.0 / rate
     velocities = np.zeros_like(positions)
     velocities[1:-1] = (positions[2:] - positions[:-2]) / (2 * dt)
+
+    peak = float(np.abs(velocities).max())
+    if peak > MAX_JOINT_VELOCITY:
+        # Per-tick steps can each be small while still adding up to a fast
+        # sustained swing (e.g. the wrist spinning up near a singularity), so
+        # cap the differentiated velocity over the whole trajectory too.
+        raise RuntimeError(
+            f"Precomputed trajectory peaks at {peak:.2f} rad/s joint velocity "
+            f"(limit {MAX_JOINT_VELOCITY} rad/s) - the path likely passes near "
+            f"a singularity. Refusing to stream. Try a different start pose, "
+            f"a smaller --size, or a lower --speed."
+        )
     return positions, velocities
 
 
