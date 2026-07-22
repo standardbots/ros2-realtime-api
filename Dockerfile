@@ -21,6 +21,8 @@ WORKDIR /app
 
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 RUN pip install standardbots
+# ikpy: client-side FK/IK for the joint-space streaming examples (stream_cube_vel.py)
+RUN pip install ikpy
 
 RUN mkdir -p /etc/standardbots/configuration/
 COPY ./cyclonedds.xml /etc/standardbots/configuration/cyclonedds.xml

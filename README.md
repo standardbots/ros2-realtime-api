@@ -95,6 +95,16 @@ Rotate J4 & J5 +0.1 rad via a timed joint trajectory:
 ./run.sh python3 ./src/stream_joint_trajectory.py
 ```
 
+Trace a 10cm axis-aligned cube with the tooltip via **joint streaming with client-supplied velocities** (client-side IK against the URDFs in `src/robot_urdfs/`):
+
+```
+./run.sh python3 ./src/stream_cube_vel.py [--robot thor] [--size 0.10] [--speed 0.05] [--rate 100]
+```
+
+- The robot only *uses* the streamed velocities when the `trustClientStreamVelocity` feature flag is enabled on the control box (arm-control-bot restart required). With the flag off, or with `--no-velocities`, the robot ignores velocity and smooths the position stream as before — run both to A/B the difference.
+- Pass `--dry-run` first to precompute and validate the trajectory (workspace + IK checks) without moving the arm. The cube extends +X/+Y/+Z from the current tooltip pose.
+- The script prints tracking-error stats (commanded vs `robot_joints`) at the end of each run.
+
 Open -> closed -> open the gripper:
 
 ```
