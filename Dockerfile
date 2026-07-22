@@ -35,6 +35,8 @@ ENV ROS_DOMAIN_ID=1
 # Flush stdout/stderr in real time instead of block-buffering (no TTY under `docker run`)
 ENV PYTHONUNBUFFERED=1
 
-COPY ./src/* ./src/
+# COPY with a glob flattens subdirectories (src/robot_urdfs/ would lose its
+# directory); copy the tree instead.
+COPY ./src ./src
 
 CMD [ "python3", "src/read_joint_states.py" ]
