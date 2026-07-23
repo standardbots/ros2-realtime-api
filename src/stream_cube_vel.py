@@ -223,7 +223,8 @@ class StreamCubeVel(Node):
         print("(error = lag + smoothing; expect it to drop sharply when "
               "velocities are streamed and trustClientStreamVelocity is on)")
 
-    def start(self, robot, size, speed, accel, settle, rate, use_velocities, dry_run):
+    def start(self, robot, size, speed, accel, settle, rate, use_velocities,
+              zero_velocities, dry_run):
         print("Waiting for start joint state...")
         deadline = time.monotonic() + 10
         while self.start_positions is None and time.monotonic() < deadline:
@@ -253,9 +254,12 @@ class StreamCubeVel(Node):
         points = cube_cartesian_path(origin, size, speed, accel, settle, rate)
         positions, velocities = solve_joint_trajectory(chain, start_joints, points, rate)
         duration = len(positions) / rate
+        vel_mode = 'ON' if use_velocities else 'OFF (position-only)'
+        if zero_velocities:
+            vel_mode = 'ZEROED (degenerate: trusted mode with contradictory v=0)'
         print(f"Trajectory: {len(positions)} setpoints, {duration:.1f}s, "
               f"peak joint velocity {np.abs(velocities).max():.3f} rad/s, "
-              f"velocities {'ON' if use_velocities else 'OFF (position-only)'}")
+              f"velocities {vel_mode}")
 
         if dry_run:
             print("Dry run - not streaming.")
@@ -273,7 +277,14 @@ class StreamCubeVel(Node):
             msg.header.stamp = self.get_clock().now().to_msg()
             msg.name = names
             msg.position = positions[k].tolist()
-            if use_velocities:
+            if zero_velocities:
+                # Degenerate test mode: a FULL velocity vector (so the robot's
+                # trusted-velocity path engages) whose content claims the arm
+                # should be stationary at every point. Expect rough, steppy
+                # motion — the smoother is bypassed AND there is no velocity
+                # feedforward to bridge between points.
+                msg.velocity = [0.0] * len(names)
+            elif use_velocities:
                 # The bridge forwards velocity only when it is one-per-joint;
                 # the robot uses it only when trustClientStreamVelocity is on.
                 msg.velocity = velocities[k].tolist()
@@ -311,6 +322,11 @@ if __name__ == "__main__":
     parser.add_argument('--no-velocities', dest='no_velocities', action='store_true',
                         help='Stream positions only (A/B baseline: the robot smooths '
                              'the position stream and derives velocity itself)')
+    parser.add_argument('--zero-velocities', dest='zero_velocities', action='store_true',
+                        help='Stream a full velocity vector of ZEROS with moving positions '
+                             '(degenerate test: engages the trusted-velocity path with '
+                             'kinematically inconsistent input; expect steppy motion). '
+                             'Keep --speed low.')
     parser.add_argument('--dry-run', dest='dry_run', action='store_true',
                         help='Precompute and validate the trajectory, do not stream')
     args = parser.parse_args()
@@ -325,9 +341,12 @@ if __name__ == "__main__":
     print('Streaming cube (joint-space) to robot: ', node.robot_id)
 
     try:
+        if args.zero_velocities and args.no_velocities:
+            raise SystemExit("--zero-velocities and --no-velocities are mutually exclusive")
         node.start(robot=args.robot, size=args.size, speed=args.speed,
                    accel=args.accel, settle=args.settle, rate=args.rate,
-                   use_velocities=not args.no_velocities, dry_run=args.dry_run)
+                   use_velocities=not args.no_velocities,
+                   zero_velocities=args.zero_velocities, dry_run=args.dry_run)
     except KeyboardInterrupt:
         print("KeyboardInterrupt received. Shutting down...")
     finally:
