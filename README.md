@@ -101,7 +101,7 @@ Trace a 10cm axis-aligned cube with the tooltip via **joint streaming with clien
 ./run.sh python3 ./src/stream_cube_vel.py [--robot thor] [--size 0.10] [--speed 0.05] [--rate 100]
 ```
 
-- The robot only *uses* the streamed velocities when the `trustClientStreamVelocity` feature flag is enabled on the control box (arm-control-bot restart required). With the flag off, or with `--no-velocities`, the robot ignores velocity and smooths the position stream as before — run both to A/B the difference.
+- The robot only *uses* the streamed velocities when the `jointPositionVelocityMode` feature flag is enabled on the control box (arm-control-bot restart required). With the flag off, or with `--no-velocities`, the robot ignores velocity and smooths the position stream as before — run both to A/B the difference.
 - Pass `--dry-run` first to precompute and validate the trajectory (workspace + IK checks) without moving the arm. The cube extends +X/+Y/+Z from the current tooltip pose.
 - The script prints tracking-error stats (commanded vs `robot_joints`) at the end of each run.
 
@@ -114,7 +114,7 @@ Trace a circle with the tooltip (same streaming machinery as the cube, but one s
 - The circle passes through the current tooltip and extends away from it in the plane's first axis (+X for `xy`/`xz`, +Y for `yz`), so make sure that side is clear.
 - Same velocity flags as `stream_cube_vel.py`: `--no-velocities`, `--zero-velocities`, `--dry-run`.
 
-Measure stream-path jitter, and what it does to trusted-velocity tracking:
+Measure stream-path jitter, and what it does to position+velocity streaming tracking:
 
 ```
 ./run.sh python3 ./src/measure_stream_jitter.py --passive-only          # cadence + loop stats only, no motion
@@ -123,7 +123,7 @@ Measure stream-path jitter, and what it does to trusted-velocity tracking:
 ```
 
 - Phases: (1) `robot_joints` inter-arrival stats, (2) the client send-loop's own wake-up jitter, (3) a raised-cosine wave on one joint (default joint5) streamed with velocities, under an optional injected fault model: `delay`, `drop`, `burst`, or `stale-vel`.
-- With `trustClientStreamVelocity` on, a sample arriving `d` seconds late while the joint moves at `v` rad/s becomes a velocity transient of roughly `v*d/fohLpfTau` — so use this to sanity-check a small `fohLpfTau` against realistic jitter before trusting it. Compare `--inject none` against the injection modes, and add `--no-velocities` to A/B how the position-smoothing path digests the same abuse.
+- With `jointPositionVelocityMode` on, a sample arriving `d` seconds late while the joint moves at `v` rad/s becomes a velocity transient of roughly `v*d/fohLpfTau` — so use this to sanity-check a small `fohLpfTau` against realistic jitter before trusting it. Compare `--inject none` against the injection modes, and add `--no-velocities` to A/B how the position-smoothing path digests the same abuse.
 
 Open -> closed -> open the gripper:
 

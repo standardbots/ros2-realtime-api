@@ -154,7 +154,7 @@ class StreamCircleVel(Node):
               f"worst-joint error mean {np.degrees(errors.mean()):.2f} deg, "
               f"max {np.degrees(errors.max()):.2f} deg")
         print("(error = lag + smoothing; expect it to drop sharply when "
-              "velocities are streamed and trustClientStreamVelocity is on)")
+              "velocities are streamed and jointPositionVelocityMode is on)")
 
     def start(self, robot, radius, speed, accel, settle, laps, plane, rate,
               use_velocities, zero_velocities, dry_run):
@@ -228,7 +228,7 @@ class StreamCircleVel(Node):
                 msg.velocity = [0.0] * len(names)
             elif use_velocities:
                 # The bridge forwards velocity only when it is one-per-joint;
-                # the robot uses it only when trustClientStreamVelocity is on.
+                # the robot uses it only when jointPositionVelocityMode is on.
                 msg.velocity = velocities[k].tolist()
             self.publisher.publish(msg)
             rclpy.spin_once(self, timeout_sec=0)

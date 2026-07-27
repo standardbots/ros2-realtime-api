@@ -10,7 +10,7 @@ Three phases:
      joint with client-supplied velocities, optionally injecting controlled
      jitter, then report tracking error and the observed joint velocity.
 
-Why: with trustClientStreamVelocity on, the robot reconstructs the command as
+Why: with jointPositionVelocityMode on, the robot reconstructs the command as
 FOH(q, v) through a low-pass filter with time constant fohLpfTau. A sample
 arriving late by d seconds while the joint moves at v rad/s is a prediction
 error of ~v*d rad, which the filter turns into a velocity transient of up to
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Measure external-control stream jitter, and optionally inject '
                     'controlled jitter into a single-joint wave to see how the '
-                    'trusted-velocity path (trustClientStreamVelocity + fohLpfTau) '
+                    'trusted-velocity path (jointPositionVelocityMode + fohLpfTau) '
                     'handles it',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--bot-id', dest='bot_id', type=str, help='Robot ID to stream joints to')
