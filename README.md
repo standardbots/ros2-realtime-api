@@ -105,6 +105,26 @@ Trace a 10cm axis-aligned cube with the tooltip via **joint streaming with clien
 - Pass `--dry-run` first to precompute and validate the trajectory (workspace + IK checks) without moving the arm. The cube extends +X/+Y/+Z from the current tooltip pose.
 - The script prints tracking-error stats (commanded vs `robot_joints`) at the end of each run.
 
+Trace a circle with the tooltip (same streaming machinery as the cube, but one smooth constant-curvature path with no corner stops — a cleaner probe of steady-state tracking lag):
+
+```
+./run.sh python3 ./src/stream_circle_vel.py [--robot thor] [--radius 0.05] [--plane xy] [--laps 2] [--speed 0.05] [--rate 100]
+```
+
+- The circle passes through the current tooltip and extends away from it in the plane's first axis (+X for `xy`/`xz`, +Y for `yz`), so make sure that side is clear.
+- Same velocity flags as `stream_cube_vel.py`: `--no-velocities`, `--zero-velocities`, `--dry-run`.
+
+Measure stream-path jitter, and what it does to trusted-velocity tracking:
+
+```
+./run.sh python3 ./src/measure_stream_jitter.py --passive-only          # cadence + loop stats only, no motion
+./run.sh python3 ./src/measure_stream_jitter.py                         # + clean single-joint wave baseline
+./run.sh python3 ./src/measure_stream_jitter.py --inject delay --delay-prob 0.05 --delay-max 50
+```
+
+- Phases: (1) `robot_joints` inter-arrival stats, (2) the client send-loop's own wake-up jitter, (3) a raised-cosine wave on one joint (default joint5) streamed with velocities, under an optional injected fault model: `delay`, `drop`, `burst`, or `stale-vel`.
+- With `trustClientStreamVelocity` on, a sample arriving `d` seconds late while the joint moves at `v` rad/s becomes a velocity transient of roughly `v*d/fohLpfTau` — so use this to sanity-check a small `fohLpfTau` against realistic jitter before trusting it. Compare `--inject none` against the injection modes, and add `--no-velocities` to A/B how the position-smoothing path digests the same abuse.
+
 Open -> closed -> open the gripper:
 
 ```
