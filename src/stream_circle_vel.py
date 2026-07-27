@@ -1,4 +1,3 @@
-import os
 import time
 import rclpy
 import argparse
@@ -6,166 +5,96 @@ import numpy as np
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 from sensor_msgs.msg import JointState
-from ikpy.chain import Chain
 
 from detect_bot_id import detect_bot_id
+from stream_cube_vel import load_chain, solve_joint_trajectory
 
-# Cube corners as (x, y, z) offsets in units of the cube side, ordered so that
-# consecutive corners differ on a single axis (a Gray-code Hamiltonian cycle).
-# Every move is therefore axis-aligned, all 8 corners are visited, and the path
-# returns to the starting corner. (Same path as stream_cube.py.)
-CUBE_CORNERS = [
-    (0, 0, 0),
-    (0, 0, 1),
-    (0, 1, 1),
-    (0, 1, 0),
-    (1, 1, 0),
-    (1, 1, 1),
-    (1, 0, 1),
-    (1, 0, 0),
-    (0, 0, 0),
-]
-
-URDF_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "robot_urdfs")
-
-# Abort thresholds for the precomputed joint path. A per-tick step above
-# MAX_JOINT_STEP means the IK solver jumped to a different solution branch; an
-# FK error above MAX_FK_ERROR means it failed to converge (usually a cube
-# corner outside the reachable workspace at the fixed orientation). Streaming
-# either would command a violent or wrong move, so we refuse instead.
-MAX_JOINT_STEP = 0.03       # rad between consecutive setpoints
-MAX_FK_ERROR = 0.005        # m between requested and solved tooltip position
-MAX_JOINT_VELOCITY = 1.0    # rad/s anywhere in the precomputed trajectory
+# Unit axis pairs (u, w) spanning each supported circle plane. The circle's
+# center sits +radius along u from the current tooltip, so the whole trace
+# extends in +u; the tooltip itself is the point of the circle nearest the
+# start pose (start == end).
+PLANE_AXES = {
+    "xy": ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0)),
+    "xz": ((1.0, 0.0, 0.0), (0.0, 0.0, 1.0)),
+    "yz": ((0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
+}
+PLANE_CENTER_AXIS = {"xy": "X", "xz": "X", "yz": "Y"}
 
 
-def load_chain(robot: str) -> Chain:
-    urdf = os.path.join(URDF_DIR, f"{robot}.urdf")
-    # base_link -> joint0..joint5 -> flange; only the 6 revolute joints are
-    # active (indices 1-6), the rest are fixed frames.
-    return Chain.from_urdf_file(
-        urdf,
-        base_elements=["base_link"],
-        active_links_mask=[False, True, True, True, True, True, True, False, False],
-    )
-
-
-def cube_cartesian_path(origin, size, speed, accel, settle, rate):
-    """Tooltip positions for the cube trace, one per tick at `rate` Hz.
-
-    Each edge follows the same trapezoidal speed profile as stream_cube.py
-    (ramp at `accel`, cruise at `speed`), and each corner is held for `settle`
-    seconds so the arm comes to rest there.
-    """
+def trapezoid_profile(distance, speed, accel, rate):
+    """Arc length covered at each tick (`rate` Hz) for a single trapezoidal
+    speed profile over `distance` meters — the same ramp math
+    stream_cube_vel.cube_cartesian_path applies per cube edge, but spanning
+    one continuous run (a circle has no corners to settle at)."""
     dt = 1.0 / rate
-    corners = [np.asarray(origin) + np.asarray(c) * size for c in CUBE_CORNERS]
-    points = [corners[0]]
-    for start, target in zip(corners[:-1], corners[1:]):
-        distance = float(np.linalg.norm(target - start))
-        v, a = speed, accel
-        ramp = v * v / (2 * a)  # distance to go 0 -> v (and v -> 0)
+    v, a = speed, accel
+    ramp = v * v / (2 * a)  # distance to go 0 -> v (and v -> 0)
 
-        if 2 * ramp <= distance:
-            # Trapezoid: accelerate, cruise, decelerate.
-            t_acc = v / a
-            t_cruise = (distance - 2 * ramp) / v
-            v_peak = v
-        else:
-            # Triangle: edge too short to reach cruise speed.
-            v_peak = (a * distance) ** 0.5
-            t_acc = v_peak / a
-            t_cruise = 0.0
-            ramp = distance / 2
+    if 2 * ramp <= distance:
+        # Trapezoid: accelerate, cruise, decelerate.
+        t_acc = v / a
+        t_cruise = (distance - 2 * ramp) / v
+        v_peak = v
+    else:
+        # Triangle: arc too short to reach cruise speed.
+        v_peak = (a * distance) ** 0.5
+        t_acc = v_peak / a
+        t_cruise = 0.0
+        ramp = distance / 2
 
-        total_time = 2 * t_acc + t_cruise
-        steps = max(1, int(round(total_time * rate)))
+    total_time = 2 * t_acc + t_cruise
+    steps = max(1, int(round(total_time * rate)))
 
-        for i in range(1, steps + 1):
-            t = i * dt
-            if t < t_acc:                        # accelerating
-                s = 0.5 * a * t * t
-            elif t < t_acc + t_cruise:           # cruising
-                s = ramp + v_peak * (t - t_acc)
-            else:                                # decelerating
-                td = t - t_acc - t_cruise
-                s = ramp + v_peak * t_cruise + v_peak * td - 0.5 * a * td * td
-
-            f = min(s / distance, 1.0)
-            points.append(start + (target - start) * f)
-
-        # Hold the corner so the arm settles.
-        points.extend([target] * max(1, int(settle * rate)))
-
-    return np.array(points)
+    s = np.empty(steps)
+    for i in range(1, steps + 1):
+        t = i * dt
+        if t < t_acc:                        # accelerating
+            si = 0.5 * a * t * t
+        elif t < t_acc + t_cruise:           # cruising
+            si = ramp + v_peak * (t - t_acc)
+        else:                                # decelerating
+            td = t - t_acc - t_cruise
+            si = ramp + v_peak * t_cruise + v_peak * td - 0.5 * a * td * td
+        s[i - 1] = min(si, distance)
+    # Rounding `steps` can leave the last sample a hair short of the full
+    # distance; pin it so the trace ends exactly where it started.
+    s[-1] = distance
+    return s
 
 
-def solve_joint_trajectory(chain, start_joints, points, rate,
-                           shape_hint="the cube (+X/+Y/+Z from the current pose)",
-                           size_flag="--size"):
-    """IK-solve the cartesian path into joint positions + velocities.
+def circle_cartesian_path(origin, radius, speed, accel, settle, laps, plane, rate):
+    """Tooltip positions for `laps` full circles, one per tick at `rate` Hz.
 
-    Solves every tick seeded with the previous solution (keeps the solver on
-    one branch), holds the starting tooltip orientation, then differentiates
-    the solved joint path (central difference) to get per-tick joint
-    velocities. Aborts if the solution jumps branches or fails to converge.
-    `shape_hint` and `size_flag` customize the abort messages for callers
-    streaming a different shape (e.g. stream_circle_vel).
+    The circle lies in `plane`, passes through the current tooltip (the trace
+    starts and ends there), and its center sits +radius along the plane's
+    first axis. Tangential speed follows one trapezoidal profile over the
+    whole arc (ramp at `accel`, cruise at `speed`), then the end point is held
+    for `settle` seconds so the arm comes to rest.
     """
-    n_links = len(chain.links)
-    full = np.zeros(n_links)
-    full[1:7] = start_joints
-    orientation = chain.forward_kinematics(full)[:3, :3]
+    u, w = (np.asarray(axis) for axis in PLANE_AXES[plane])
+    origin = np.asarray(origin)
+    center = origin + radius * u
 
-    positions = np.zeros((len(points), 6))
-    report_every = max(1, len(points) // 10)
-    for k, p in enumerate(points):
-        full = chain.inverse_kinematics(
-            p, orientation, orientation_mode="all", initial_position=full
-        )
-        positions[k] = full[1:7]
+    s = trapezoid_profile(2 * np.pi * radius * laps, speed, accel, rate)
+    theta = np.pi + s / radius  # theta = pi is the tooltip itself
+    points = center + radius * (np.outer(np.cos(theta), u) + np.outer(np.sin(theta), w))
 
-        fk_err = float(np.linalg.norm(chain.forward_kinematics(full)[:3, 3] - p))
-        if fk_err > MAX_FK_ERROR:
-            raise RuntimeError(
-                f"IK did not converge at point {k}/{len(points)} (error "
-                f"{1000 * fk_err:.1f} mm) - is {shape_hint} fully inside the "
-                f"reachable workspace? Try a different start pose, a smaller "
-                f"{size_flag}, or check --robot."
-            )
-        if k % report_every == 0:
-            print(f"  IK {k}/{len(points)}...")
-
-    steps = np.abs(np.diff(positions, axis=0))
-    if steps.size and steps.max() > MAX_JOINT_STEP:
-        raise RuntimeError(
-            f"IK solution jumped {steps.max():.3f} rad between consecutive "
-            f"setpoints (branch flip) - refusing to stream. Try a different "
-            f"start pose or a smaller {size_flag}."
-        )
-
-    dt = 1.0 / rate
-    velocities = np.zeros_like(positions)
-    velocities[1:-1] = (positions[2:] - positions[:-2]) / (2 * dt)
-
-    peak = float(np.abs(velocities).max())
-    if peak > MAX_JOINT_VELOCITY:
-        # Per-tick steps can each be small while still adding up to a fast
-        # sustained swing (e.g. the wrist spinning up near a singularity), so
-        # cap the differentiated velocity over the whole trajectory too.
-        raise RuntimeError(
-            f"Precomputed trajectory peaks at {peak:.2f} rad/s joint velocity "
-            f"(limit {MAX_JOINT_VELOCITY} rad/s) - the path likely passes near "
-            f"a singularity. Refusing to stream. Try a different start pose, "
-            f"a smaller {size_flag}, or a lower --speed."
-        )
-    return positions, velocities
+    points = np.vstack([origin, points])
+    points = np.vstack([points, np.repeat(points[-1:], max(1, int(settle * rate)), axis=0)])
+    return points
 
 
-class StreamCubeVel(Node):
-    """Joint streaming over the external-control bridge: trace a cube with the
-    tooltip via client-side IK, streaming joint positions AND velocities."""
+class StreamCircleVel(Node):
+    """Joint streaming over the external-control bridge: trace a circle with
+    the tooltip via client-side IK, streaming joint positions AND velocities.
+
+    Unlike the cube (straight edges, corner stops), the circle is a single
+    smooth constant-curvature path with no rest points — a cleaner probe of
+    steady-state tracking lag, since the error never gets to reset at a
+    corner."""
 
     def __init__(self, robot_id: str | None = None):
-        super().__init__("stream_cube_vel")
+        super().__init__("stream_circle_vel")
 
         if robot_id is None:
             self.robot_id = detect_bot_id(self)
@@ -227,8 +156,8 @@ class StreamCubeVel(Node):
         print("(error = lag + smoothing; expect it to drop sharply when "
               "velocities are streamed and trustClientStreamVelocity is on)")
 
-    def start(self, robot, size, speed, accel, settle, rate, use_velocities,
-              zero_velocities, dry_run):
+    def start(self, robot, radius, speed, accel, settle, laps, plane, rate,
+              use_velocities, zero_velocities, dry_run):
         print("Waiting for start joint state...")
         deadline = time.monotonic() + 10
         while self.start_positions is None and time.monotonic() < deadline:
@@ -245,18 +174,27 @@ class StreamCubeVel(Node):
         start_joints = np.asarray(self.start_positions[:6])
         print("Start joints:", np.round(start_joints, 4).tolist())
 
+        center_axis = PLANE_CENTER_AXIS[plane]
         print(f"Loading {robot}.urdf and precomputing IK "
-              f"({size * 100:.0f}cm cube, {speed * 100:.0f}cm/s, {rate:.0f}Hz)...")
+              f"({radius * 100:.0f}cm-radius circle x{laps} in the {plane.upper()} "
+              f"plane, {speed * 100:.0f}cm/s, {rate:.0f}Hz)...")
         chain = load_chain(robot)
         n_links = len(chain.links)
         full = np.zeros(n_links)
         full[1:7] = start_joints
         origin = chain.forward_kinematics(full)[:3, 3]
         print("Tooltip (FK):", np.round(origin, 4).tolist(),
-              "- cube extends +X/+Y/+Z from here")
+              f"- circle center is +{center_axis} {radius * 100:.0f}cm from here")
 
-        points = cube_cartesian_path(origin, size, speed, accel, settle, rate)
-        positions, velocities = solve_joint_trajectory(chain, start_joints, points, rate)
+        points = circle_cartesian_path(origin, radius, speed, accel, settle,
+                                       laps, plane, rate)
+        positions, velocities = solve_joint_trajectory(
+            chain, start_joints, points, rate,
+            shape_hint=f"the circle ({radius * 100:.0f}cm radius, "
+                       f"+{center_axis} of the current pose in the "
+                       f"{plane.upper()} plane)",
+            size_flag="--radius",
+        )
         duration = len(positions) / rate
         vel_mode = 'ON' if use_velocities else 'OFF (position-only)'
         if zero_velocities:
@@ -307,20 +245,25 @@ class StreamCubeVel(Node):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Trace a cube with the tooltip by streaming joint positions '
+        description='Trace a circle with the tooltip by streaming joint positions '
                     '+ velocities (client-side IK) over the external-control bridge')
     parser.add_argument('--bot-id', dest='bot_id', type=str, help='Robot ID to stream joints to')
     parser.add_argument('--robot', dest='robot', type=str, default='thor',
                         choices=['core', 'spark', 'thor'],
                         help='URDF to use for FK/IK (default: thor)')
-    parser.add_argument('--size', dest='size', type=float, default=0.10,
-                        help='Cube side length in meters (default: 0.10)')
+    parser.add_argument('--radius', dest='radius', type=float, default=0.05,
+                        help='Circle radius in meters (default: 0.05)')
+    parser.add_argument('--plane', dest='plane', type=str, default='xy',
+                        choices=sorted(PLANE_AXES),
+                        help='Plane the circle lies in (default: xy)')
+    parser.add_argument('--laps', dest='laps', type=int, default=2,
+                        help='Number of full circles to trace (default: 2)')
     parser.add_argument('--speed', dest='speed', type=float, default=0.05,
-                        help='Cruise Cartesian speed in m/s (default: 0.05)')
+                        help='Cruise tangential speed in m/s (default: 0.05)')
     parser.add_argument('--accel', dest='accel', type=float, default=0.2,
-                        help='Cartesian acceleration in m/s^2 for the trapezoidal ramp (default: 0.2)')
+                        help='Tangential acceleration in m/s^2 for the trapezoidal ramp (default: 0.2)')
     parser.add_argument('--settle', dest='settle', type=float, default=0.5,
-                        help='Seconds to hold each corner (default: 0.5)')
+                        help='Seconds to hold the end point (default: 0.5)')
     parser.add_argument('--rate', dest='rate', type=float, default=100.0,
                         help='Setpoint stream rate in Hz (default: 100)')
     parser.add_argument('--no-velocities', dest='no_velocities', action='store_true',
@@ -340,15 +283,18 @@ if __name__ == "__main__":
     if args.bot_id is None:
         args.bot_id = detect_bot_id()
 
-    node = StreamCubeVel(robot_id=args.bot_id)
+    node = StreamCircleVel(robot_id=args.bot_id)
 
-    print('Streaming cube (joint-space) to robot: ', node.robot_id)
+    print('Streaming circle (joint-space) to robot: ', node.robot_id)
 
     try:
         if args.zero_velocities and args.no_velocities:
             raise SystemExit("--zero-velocities and --no-velocities are mutually exclusive")
-        node.start(robot=args.robot, size=args.size, speed=args.speed,
-                   accel=args.accel, settle=args.settle, rate=args.rate,
+        if args.laps < 1:
+            raise SystemExit("--laps must be >= 1")
+        node.start(robot=args.robot, radius=args.radius, speed=args.speed,
+                   accel=args.accel, settle=args.settle, laps=args.laps,
+                   plane=args.plane, rate=args.rate,
                    use_velocities=not args.no_velocities,
                    zero_velocities=args.zero_velocities, dry_run=args.dry_run)
     except KeyboardInterrupt:
