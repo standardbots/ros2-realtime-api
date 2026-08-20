@@ -4,6 +4,7 @@ import json
 import sys
 import argparse
 import time
+import os
 
 from rclpy.node import Node
 from rclpy.time import Time
